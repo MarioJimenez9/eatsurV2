@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
-import { Image, View, FlatList, StyleSheet, Text, ScrollView } from 'react-native';
+import { Image, View, FlatList, StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
 import Category from '../components/Category';
+import { CommonActions, useNavigation } from '@react-navigation/native'
+import Boton_custom from '../components/Boton_custom';
 
-const date = new Date().getHours();
 const Menu = () => {
+    const navigation = useNavigation() 
     const [images, setimages] = useState([
         require('../assets/Image1.jpg'),
         require('../assets/Image2.jpg'),
@@ -32,25 +34,14 @@ const Menu = () => {
           key = {"2"}
           numColumns={2}
           renderItem={({ item }) => (
-            <Image            
-              source={item}
-              
-              style={{                
-                width: '44%',                
-                height: 100,
-                marginTop: 50,
-                marginLeft: 15,
-                borderWidth: 1,
-                borderColor:'black',                                
-                resizeMode: "contain",
-                margin: 6,                                
-                borderRadius: 10,
-                
-              }}
-              keyExtractor={(item) => item.id}
-            />
+              <Image         
+                style={styles.imagen}
+                source={item}
+                keyExtractor={(item) => item.id}
+              ></Image>
           )}
         />        
+        <Boton_custom onPress={() => navigation.navigate('Carrito')} label={"Comprar"}></Boton_custom>
         </View>
       );
 }
@@ -75,6 +66,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding:20
 
+  },
+  imagen:{
+    width: '44%',                
+    height: 100,
+    marginTop: 50,
+    marginLeft: 15,
+    borderWidth: 1,
+    borderColor:'black',                                
+    resizeMode: "contain",
+    margin: 6,                                
+    borderRadius: 10,
   },
   subtitulo: {
     fontSize: 18,
