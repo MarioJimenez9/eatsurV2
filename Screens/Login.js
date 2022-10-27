@@ -1,39 +1,49 @@
+
+
+import * as React from 'react'
 import SvgComponent from '../components/SvgComponent';
 import { TextInput, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Boton_custom from '../components/Boton_custom';
-import { collection, getDocs } from "firebase/firestore";
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useState } from 'react';
-import db from '../database/firebase'
+
+
+
+import { auth } from '../database/firebase';
+
+
 
 
 const Login = ({ navigation }) => {
+  
+  
+  const[email,setEmail] = useState('')
+  const[password,setPassword] = useState('')
 
-  const [state, setState] = useState({
-    email: "",
-    password: "",
-  })
-
-  const handleChangeText = (name, value) => {
-    setState({ ...state, [name]: value });
-  };
-
-//VALIDA EL LOGIN PERO CREO QUE SE PUEDE MEJORAR
-  const validate = ( async () => {
-    var logueado = false;
-    const querySnapshot = await getDocs(collection(db, "users"));
-      querySnapshot.forEach((doc) => {
-        const { name, email, password, phone } = doc.data()        
-        if (email == state.email.toLowerCase() && password == state.password) {
-          logueado = true;
-          
+  loginUser = async (email,password) =>{
+    try{
+        
+        //alert(auth.currentUser)
+        
+        
+        await signInWithEmailAndPassword(auth, email,password)
+        auth.currentUser.reload()
+        
+        if(auth.currentUser.emailVerified==false){
+          alert("Correo no verificado")
+          signOut(auth)
+        }else{
+          //alert(auth.currentUser)
         }
-      });
-    if (logueado === true) {
-      navigation.navigate('Menu')
-    }else{
-      alert('Datos incorrectos')
+        
+          
+    }catch(error){
+      alert(error)
+      alert("Datos incorrectos")
     }
-  })
+  }
+  
+ 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.containerSVG}>
@@ -45,15 +55,15 @@ const Login = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder='Correo electronico'
-          onChangeText={(value) => handleChangeText("email", value)}
+          onChangeText={(value) => setEmail(value)}
         />
         <TextInput secureTextEntry
           style={styles.input}
           placeholder='Contraseña'
-          onChangeText={(value) => handleChangeText("password", value)}
+          onChangeText={(value) => setPassword(value)}
         />
         <Text style={styles.Text}>¿Olvidaste tu contraseña?</Text>
-        <Boton_custom onPress={() => validate()} label={"Iniciar sesión"}></Boton_custom>
+        <Boton_custom onPress={() => loginUser(email,password)} label={"Iniciar sesión"}></Boton_custom>
         <TouchableOpacity onPress={() => navigation.navigate('Crear cuenta')}>
           <Text style={styles.Text}>No tengo una cuenta</Text>
         </TouchableOpacity>
