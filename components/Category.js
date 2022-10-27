@@ -1,4 +1,5 @@
 import { Image, View,  StyleSheet, Text,  } from 'react-native';
+import { Button } from 'react-native';
 const Category = (props) =>{
         return(
             <View style={{height:190,width:150,
@@ -19,7 +20,9 @@ const Category = (props) =>{
                     paddingTop:10,                    
                   }}>
                     <Text>{props.name}</Text>
+                  
                   </View>
+                  
               </View>
         )      
 }

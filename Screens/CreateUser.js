@@ -2,96 +2,67 @@ import { useState } from "react";
 import Boton_custom from "../components/Boton_custom";
 import SvgComponent from "../components/SvgComponent";
 import { TextInput, View, Text, StyleSheet } from 'react-native';
-import { collection, addDoc } from "firebase/firestore";
-import { getDocs } from "firebase/firestore";
-import db from '../database/firebase'
+
+import { auth } from '../database/firebase';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile  } from "firebase/auth";
 
 const CreateUser = (props) => {
-    const [state, setState] = useState({
-        name: "",
-        email: "",
-        password: "",
-        phone: ""
-    })
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [number, setNumber] = useState('')
+    const [name, setName] = useState('')
 
+    
     //Nos sirve para actualizar las variables de estado que estan arriba. Lo usan los textInput
     const handleChangeText = (name, value) => {
         setState({ ...state, [name]: value });
     };
 
-    //Recorre los datos de usuarios de la bd para ver si ya existe el correo ingresado en caso de que  no exista se agrega el usuario
-    const validateData = async () => {
-        var exists = false;
-        const querySnapshot = await getDocs(collection(db, "users"));        
-        querySnapshot.forEach((doc) => {
-            const { email} = doc.data()                        
-            if (email == state.email.toLowerCase()) {                
-                exists = true                                     
-            }
-        })
-        if(!exists){
-            addDoc(collection(db, "users"), {
-                name: state.name,
-                email: state.email,
-                password: state.password,
-                phone: state.phone
-    
-            })
-                .then(() => {
-                    alert('¡Se ha creado tu cuenta satisfactoriamente! Ahora inicia sesión con tus datos')
-                    props.navigation.navigate('Login');
-                })
-                .catch((error) => {
-                    alert(error.message);
-             });
-            
-        }else{
-            alert('Ya existe una cuenta con ese correo.')     
-        }
+    registerUser = async (email,password) =>{
+        await createUserWithEmailAndPassword(auth,email,password)
         
-    }
+        .then(()=>{                        
+            
+            sendEmailVerification(auth.currentUser,{
+                handleCodeInApp: true,
+                url : 'https://eatsur-project.firebaseapp.com',
 
+            }).then(()=>{
+                auth.upda
+                updateProfile(auth.currentUser, {
+                    
+                    displayName: name //photoURL: "https://example.com/jane-q-user/profile.jpg"
+                })
+            })
+            .then(()=>{                
+                alert(["Se ha enviado un correo de verificación a tu correo "])
+                props.navigation.navigate('Login');
+                
+                
+            }).catch((error)=>{
+                alert(error)
+            }).then(()=>{
+              
+            })
+        })
+    }
+     
 
     //Regex para validar el email
     const validateEmail = (email) => {
-
-        var re = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-        return re.test(email);
+        
+        const re = /^[a-zA-Z0-9.!#$%&'*+/=^_`{|}~-]+@+(alumnos.itsur.edu.mx)$/;        
+        
+        if (re.test(email) && password.length>0){
+            registerUser(email,password)
+        }else{
+            alert("Datos no validos")
+        }
+        
     };
 
     //Funcion para agregar usuario, verifica si se llenaron los campos correctamente y llama a validateData
-    const AddNewUser =   () => {
-        var flag = false;
-
-        if (state.name === '') {
-            alert("Debes ingresar un nombre")
-            flag = true;
-        }
-        if (state.email === '') {
-            alert("Debes ingresar un correo electronico")
-            flag = true;
-        }
-        if (state.password === '') {
-            alert("Debes ingresar un correo electronico")
-            flag = true;
-        }
-        if (state.phone === '') {
-            alert("Debes ingresar un número de telefono")
-            flag = true;
-        }
-
-        if (flag == false) {
-            if (validateEmail(state.email)) {                
-                validateData()   
-            }else{
-                alert('Debes proporcionar un correo electronico valido')
-            }
-        }
-
-
-
-
-    }
+   
 
     return (
         <View style={styles.mainContainer}>
@@ -103,27 +74,25 @@ const CreateUser = (props) => {
                 <Text style={styles.subtitulo}>Ingresa tus datos</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder='Nombre de usuario'
-                    onChangeText={(value) => handleChangeText("name", value)}
+                    placeholder='Nombre'
+                    onChangeText={(value) => setName(value)}
+
                 />
                 <TextInput
                     style={styles.input}
                     placeholder='Correo electronico'
-                    onChangeText={(value) => handleChangeText("email", value)}
+                    onChangeText={(value) => setEmail(value)}
 
                 />
                 <TextInput secureTextEntry
                     style={styles.input}
                     placeholder='Contraseña'
-                    onChangeText={(value) => handleChangeText("password", value)}
+                    onChangeText={(value) => setPassword(value)}
                 />
-                <TextInput
-                    keyboardType="numeric"
-                    style={styles.input}
-                    placeholder='Número de telefono'
-                    onChangeText={(value) => handleChangeText("phone", value)}
-                />
-                <Boton_custom onPress={() => AddNewUser()} label={"Crear"}></Boton_custom>
+                
+               
+                
+                <Boton_custom onPress={() => validateEmail(email)} label={"Crear"}></Boton_custom>
             </View>
         </View>
     )

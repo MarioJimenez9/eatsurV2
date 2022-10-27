@@ -1,8 +1,12 @@
 import React, {useState} from 'react';
-import { Image, View, FlatList, StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { Image, View, FlatList, StyleSheet, Text, ScrollView, TouchableOpacity, Button } from 'react-native';
 import Category from '../components/Category';
 import { CommonActions, useNavigation } from '@react-navigation/native'
 import Boton_custom from '../components/Boton_custom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../database/firebase';
+import { BottomTab } from '../components/BottomTab';
+import Product from '../components/product';
 
 const Menu = () => {
     const navigation = useNavigation() 
@@ -18,30 +22,25 @@ const Menu = () => {
 
      
 
-      return (
+      return (        
         <View style={styles.mainContainer}>
+          
           <Text style={styles.titulo}>Tal vez quieras filtrar por...</Text>
           <ScrollView  horizontal={true}>            
           <Category imageUri={require('../assets/Image1.jpg')} name="Comida"></Category>
-          <Category imageUri={require('../assets/Image1.jpg')} name="Bebidas"></Category>
-          <Category imageUri={require('../assets/Image1.jpg')} name="Papas fritas"></Category>
-          <Category imageUri={require('../assets/Image1.jpg')} name="Dulces"></Category>                    
+          <Category imageUri={require('../assets/Image6.jpg')} name="Bebidas"></Category>
+          <Category imageUri={require('../assets/Image7.jpg')} name="Papas fritas"></Category>
+          <Category imageUri={require('../assets/Image8.jpg')} name="Dulces"></Category>                    
           </ScrollView>
           <Text style={styles.titulo}>Esto es lo que tenemos para ti: </Text>
           
-          <FlatList 
-          data = {images}
-          key = {"2"}
-          numColumns={2}
-          renderItem={({ item }) => (
-              <Image         
-                style={styles.imagen}
-                source={item}
-                keyExtractor={(item) => item.id}
-              ></Image>
-          )}
-        />        
-        <Boton_custom onPress={() => navigation.navigate('Carrito')} label={"Comprar"}></Boton_custom>
+          <ScrollView  horizontal={false} >            
+          <Product imageUri={require('../assets/Image5.jpg')} name="Chilaquiles" price="$30" description="Puedes pedirlos con: Huevo, frijoles, verdes o rojos." nota="El precio varia según lo que elijas. Da click en el producto para mas detalles."></Product>        
+          <Product imageUri={require('../assets/Image9.jpg')} name="Platillo del día" price="$50" description="No hay modificaciones posibles a este producto" nota="El precio de este producto es fijo."></Product>
+          <Product imageUri={require('../assets/Image10.jpg')} name="Huarache" price="$32" description="Puedes pedirlos con: Chorizo, bistec, harina o maíz." nota="El precio varia según lo que elijas. Da click en el producto para mas detalles."></Product>
+                           
+          </ScrollView> 
+                     
         </View>
       );
 }
