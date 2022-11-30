@@ -1,7 +1,6 @@
 
-import react from "react"
+import React from "react"
 import Svg, { Defs, LinearGradient, Stop, Path } from "react-native-svg"
-
 const SvgComponent = () => (
     <Svg    
       style={{

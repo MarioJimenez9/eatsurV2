@@ -1,45 +1,30 @@
-
-
 import * as React from 'react'
 import SvgComponent from '../components/SvgComponent';
 import { TextInput, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Boton_custom from '../components/Boton_custom';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useState } from 'react';
-
-
-
 import { auth } from '../database/firebase';
-
-
-
-
+import { useContexto } from '../Context/Contexto';
 const Login = ({ navigation }) => {
   
-  
+  const {admin, setAdmin} = useContexto();
   const[email,setEmail] = useState('')
   const[password,setPassword] = useState('')
 
   loginUser = async (email,password) =>{
     try{
-        
-        //alert(auth.currentUser)
-        
-        
         await signInWithEmailAndPassword(auth, email,password)
-        auth.currentUser.reload()
-        
+        auth.currentUser.reload();
+        setAdmin(auth.currentUser.email === "s19120174@alumnos.itsur.edu.mx");
         if(auth.currentUser.emailVerified==false){
           alert("Correo no verificado")
           signOut(auth)
-        }else{
-          //alert(auth.currentUser)
+        }else{  
+          alert(user + " - " + auth.currentUser.email);
         }
-        
-          
     }catch(error){
-      alert(error)
-      alert("Datos incorrectos")
+      alert(error);
     }
   }
   

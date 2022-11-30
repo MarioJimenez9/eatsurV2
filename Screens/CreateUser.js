@@ -2,7 +2,7 @@ import { useState } from "react";
 import Boton_custom from "../components/Boton_custom";
 import SvgComponent from "../components/SvgComponent";
 import { TextInput, View, Text, StyleSheet } from 'react-native';
-
+import {Image} from 'react-native';
 import { auth } from '../database/firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile  } from "firebase/auth";
 

@@ -1,30 +1,39 @@
-import React, {useState} from 'react';
-import { Image, View, FlatList, StyleSheet, Text, ScrollView, TouchableOpacity, Button } from 'react-native';
+import * as React from 'react';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import Category from '../components/Category';
-import { CommonActions, useNavigation } from '@react-navigation/native'
-import Boton_custom from '../components/Boton_custom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../database/firebase';
-import { BottomTab } from '../components/BottomTab';
-import Product from '../components/product';
+import { collection, onSnapshot, query} from 'firebase/firestore';
+import { auth, db } from '../database/firebase';
+import Product from '../components/Product';
+import { useContexto } from '../Context/Contexto';
 
 const Menu = () => {
-    const navigation = useNavigation() 
-    const [images, setimages] = useState([
-        require('../assets/Image1.jpg'),
-        require('../assets/Image2.jpg'),
-        require('../assets/Image3.jpg'),
-        require('../assets/Image4.jpg'),
-        require('../assets/Image4.jpg'),
-        require('../assets/Image4.jpg'),
-        require('../assets/Image4.jpg')
-      ]);
-
-     
-
+    const {admin, setAdmin} = useContexto();
+    const [productos, setProductos] = React.useState([]);
+      React.useEffect(() => {
+        const collectionRef = collection(db, "Productos");
+        const q = query(collectionRef);
+        console.log(auth.currentUser.email === "s19120174@alumnos.itsur.edu.mx");
+        setAdmin(auth.currentUser.email === "s19120174@alumnos.itsur.edu.mx");
+        const unsuscribe = onSnapshot(q, querySnapshot => {
+          setProductos(
+            querySnapshot.docs.map(
+              doc => ({
+                id: doc.id,
+                nombre: doc.data().nombre,
+                descripcion: doc.data().descripcion,
+                imageUri: doc.data().imageUri,
+                precio: doc.data().precio 
+              })
+            )
+          )
+        });
+        
+        return unsuscribe;
+        
+      }, []);
+      
       return (        
         <View style={styles.mainContainer}>
-          
           <Text style={styles.titulo}>Tal vez quieras filtrar por...</Text>
           <ScrollView  horizontal={true}>            
           <Category imageUri={require('../assets/Image1.jpg')} name="Comida"></Category>
@@ -34,13 +43,13 @@ const Menu = () => {
           </ScrollView>
           <Text style={styles.titulo}>Esto es lo que tenemos para ti: </Text>
           
-          <ScrollView  horizontal={false} >            
-          <Product imageUri={require('../assets/Image5.jpg')} name="Chilaquiles" price="$30" description="Puedes pedirlos con: Huevo, frijoles, verdes o rojos." nota="El precio varia según lo que elijas. Da click en el producto para mas detalles."></Product>        
-          <Product imageUri={require('../assets/Image9.jpg')} name="Platillo del día" price="$50" description="No hay modificaciones posibles a este producto" nota="El precio de este producto es fijo."></Product>
-          <Product imageUri={require('../assets/Image10.jpg')} name="Huarache" price="$32" description="Puedes pedirlos con: Chorizo, bistec, harina o maíz." nota="El precio varia según lo que elijas. Da click en el producto para mas detalles."></Product>
-                           
-          </ScrollView> 
-                     
+          <ScrollView  horizontal={false} >
+                      
+            {productos.map(
+              (p, k) => <Product key={k} id={p.id} imageUri={p.imageUri} name={p.nombre} price={p.precio} description={p.descripcion}></Product>
+            )}
+
+          </ScrollView>          
         </View>
       );
 }

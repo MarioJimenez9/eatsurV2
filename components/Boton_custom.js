@@ -2,7 +2,7 @@ import react from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { TextInput, View, Text, Button, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native'
-
+import {Image} from 'react-native';
 //Boton reutilizable
 
 function Boton_custom({    
